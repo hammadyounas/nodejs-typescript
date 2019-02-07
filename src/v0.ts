@@ -1,0 +1,28 @@
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as swaggerUi from 'swagger-ui-express';
+import { Router, errorHandler, OpenAPI } from 'openapi-router';
+import { url } from './v0-routes';
+// import * as mysql from 'mysql';
+
+export const app: express.Express = express();
+const spec = require('../specs/v0.json') as OpenAPI.Schema;
+const router = new Router(spec, app);
+
+app.use(bodyParser.json());
+
+// Documentation routes
+app.get('/spec', (req, res) => {
+  res.send(spec);
+});
+
+app.use(url);
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
+
+// TODO: implement routes
+
+router.addCatchAllRoutes();
+
+// Sub-application specific route handlers
+app.use(errorHandler);
